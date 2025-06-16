@@ -58,7 +58,10 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       const clientToken = request.cookies.access_token;
 
       try {
-        const secret = await twoFactorService.getSecretFromMainServer(clientToken);
+        const secret = await twoFactorService.getSecretFromMainServer(
+          clientToken,
+          request.user.email,
+        );
         const verified = twoFactorService.verifyToken(secret, token);
 
         if (!verified) {

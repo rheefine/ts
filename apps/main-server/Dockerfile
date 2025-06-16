@@ -31,6 +31,9 @@ COPY --from=builder /app/apps/main-server/dist ./apps/main-server/dist
 COPY --from=builder /app/libs/dto/dist ./libs/dto/dist
 COPY --from=builder /app/libs/dto/node_modules/ ./libs/dto/node_modules 
 
+# migrations 폴더 복사 추가
+COPY --from=builder /app/apps/main-server/migrations ./apps/main-server/migrations
+
 # .env 파일 복사 추가
 COPY --from=builder /app/apps/main-server/.env ./apps/main-server/.env
 
@@ -38,6 +41,6 @@ COPY --from=builder /app/apps/main-server/.env ./apps/main-server/.env
 COPY --from=builder /app/node_modules/ ./node_modules
 COPY --from=builder /app/apps/main-server/node_modules/ ./apps/main-server/node_modules
 
-# auth-server 실행
-WORKDIR /app/apps/auth-server
+# main-server 실행
+WORKDIR /app/apps/main-server
 CMD ["pnpm", "run", "start"]

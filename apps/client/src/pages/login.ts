@@ -1,5 +1,6 @@
 import { createElement } from '../utils/dom';
 import { navigateTo } from '../main';
+import { redirectToGoogleAuth } from '../services/auth/google.api';
 
 export function renderLoginHTML(): string {
   return `
@@ -28,7 +29,7 @@ export function renderLogin(): HTMLElement {
   if (typeof window !== 'undefined') {
     const googleButton = wrapper.querySelector('#google-login-btn')!;
     googleButton.addEventListener('click', () => {
-      // 히스토리 API 사용하여 로비로 이동
+      redirectToGoogleAuth();
       navigateTo('/lobby');
     });
   }

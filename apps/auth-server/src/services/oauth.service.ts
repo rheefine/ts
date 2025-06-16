@@ -45,9 +45,9 @@ export class OAuthService {
     return userRes.data;
   }
 
-  async checkTwoFAStatus(accessToken: string): Promise<boolean> {
+  async checkTwoFAStatus(accessToken: string, email: string): Promise<boolean> {
     const twoFARes = await axios.post<UserSettingResponseDTO>(
-      `${process.env.MAIN_SERVER_URL}/api/user/setting`,
+      `${process.env.MAIN_SERVER_URL}/api/user/setting?email=${email}`,
       {},
       {
         headers: { Authorization: `Bearer ${accessToken}` },

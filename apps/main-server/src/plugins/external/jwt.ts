@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin';
-import jwt from '@fastify/jwt';
 import cookie from '@fastify/cookie';
+import jwt from '@fastify/jwt';
 import { UserPayload } from '@hst/dto';
 
 declare module '@fastify/jwt' {

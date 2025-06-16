@@ -19,9 +19,9 @@ export class TwoFactorService {
     return await qrcode.toDataURL(otpauthUrl);
   }
 
-  async getSecretFromMainServer(clientToken: string): Promise<string> {
+  async getSecretFromMainServer(clientToken: string, email: string): Promise<string> {
     const response = await axios.get<UserSecretKeyResponseDTO>(
-      `${process.env.MAIN_SERVER_URL}/api/user/twofa`,
+      `${process.env.MAIN_SERVER_URL}/api/user/twofa?email=${email}`,
       {
         headers: {
           Authorization: `Bearer ${clientToken}`,

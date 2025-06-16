@@ -13,6 +13,15 @@ export class AuthService {
   }
 
   getRedirectUrl(twoFA: boolean): string {
-    return twoFA ? '/lobby' : '/twofa';
+    return twoFA ? '/twofa' : '/lobby';
+  }
+
+  clearAuthCookie(reply: FastifyReply): FastifyReply {
+    return reply.clearCookie('auth_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
   }
 }

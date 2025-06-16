@@ -26,42 +26,13 @@ services:
       - app
       - monitoring
 
-  prometheus:
-    image: prom/prometheus
-    ports:
-      - '9090:9090'
-    volumes:
-      - ./infra/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
-    networks:
-      - monitoring
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - '3000:3000'
-    depends_on:
-      - prometheus
-    networks:
-      - monitoring
-
   node-exporter:
     image: prom/node-exporter:latest
     ports:
-      - '9100:9100'
+      - '9200:9200'
     networks:
       - monitoring
-
-  alertmanager:
-    image: prom/alertmanager
-    volumes:
-      - ./infra/monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
-    command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-    ports:
-      - '9093:9093'
-    networks:
-      - monitoring
-
+      
   vault:
     image: hashicorp/vault
     ports:
@@ -90,7 +61,8 @@ services:
       context: .
       dockerfile: infra/waf/Dockerfile
     ports:
-      - '80:80'
+      - '8080:8080'
+      - '8443:8443'
     depends_on:
       - auth-server
       - main-server
