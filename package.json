@@ -1,0 +1,37 @@
+{
+  "name": "backend",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "dev:auth": "pnpm --filter auth-server dev",
+    "dev:main": "pnpm --filter main-server dev",
+    "install:auth": "pnpm --filter auth-server install",
+    "install:main": "pnpm --filter main-server install",
+    "remove:auth": "pnpm --filter auth-server remove",
+    "remove:main": "pnpm --filter main-server remove",
+    "build:dto": "pnpm --filter @hst/dto build",
+    "build:auth": "pnpm --filter auth-server build",
+    "build:main": "pnpm --filter main-server build",
+    "build:client": "pnpm --filter client build"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hst/dto": "workspace:*"
+    },
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.25.0",
+    "eslint-config-prettier": "^10.1.5",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.30.1"
+  }
+}

@@ -1,0 +1,110 @@
+version: '3.9'
+
+services:
+  auth-server:
+    build:
+      context: .
+      dockerfile: apps/auth-server/Dockerfile
+    ports:
+      - '4000:4000'
+    depends_on:
+      - vault
+    networks:
+      - app
+      - monitoring
+
+  main-server:
+    build:
+      context: .
+      dockerfile: apps/main-server/Dockerfile
+    ports:
+      - '8000:8000'
+    depends_on:
+      - vault
+      - auth-server
+    networks:
+      - app
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./infra/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - '9100:9100'
+    networks:
+      - monitoring
+
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+      - ./infra/monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - '9093:9093'
+    networks:
+      - monitoring
+
+  vault:
+    image: hashicorp/vault
+    ports:
+      - '8200:8200'
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: dev-token
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - app
+      - vault
+
+  vault-init:
+    build: ./infra/vault-init
+    depends_on:
+      - vault
+    restart: 'no'
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: dev-token
+    networks:
+      - vault
+
+  waf:
+    build:
+      context: .
+      dockerfile: infra/waf/Dockerfile
+    ports:
+      - '80:80'
+    depends_on:
+      - auth-server
+      - main-server
+    networks:
+      - app
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  app:
+    driver: bridge
+  monitoring:
+    driver: bridge
+  vault:
+    driver: bridge
