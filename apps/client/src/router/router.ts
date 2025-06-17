@@ -12,7 +12,8 @@ export interface Route {
 }
 
 export const routes: Route[] = [
-  { path: '/', component: renderLogin, componentHTML: renderLoginHTML },
+  { path: '/', component: () => { window.location.href = '/lobby'; return document.createElement('div'); }, componentHTML: () => '' }, // 루트 접근 시 lobby로 리다이렉트
+  { path: '/login', component: renderLogin, componentHTML: renderLoginHTML },
   { path: '/twofa', component: renderTwoFA, componentHTML: renderTwoFAHTML },
   { path: '/lobby', component: renderHome, componentHTML: renderHomeHTML, requiresAuth: true },
   {
@@ -41,7 +42,7 @@ export async function getPageContent(pathname: string): Promise<HTMLElement> {
       const isAuthenticated = await checkAuth();
       if (!isAuthenticated) {
         // 인증 실패 시 로그인 페이지로 리다이렉트
-        window.history.pushState(null, '', '/');
+        window.history.pushState(null, '', '/login');
         return renderLogin();
       }
     }
@@ -64,7 +65,7 @@ export async function getPageContentHTML(pathname: string): Promise<string> {
     if (route.requiresAuth) {
       const isAuthenticated = await checkAuth();
       if (!isAuthenticated) {
-        window.history.pushState(null, '', '/');
+        window.history.pushState(null, '', '/login');
         return renderLoginHTML();
       }
     }
@@ -76,5 +77,5 @@ export async function getPageContentHTML(pathname: string): Promise<string> {
 }
 
 export function isLoginPage(pathname: string): boolean {
-  return pathname === '/' || pathname === '/twofa';
+  return pathname === '/login' || pathname === '/twofa';
 }

@@ -3,7 +3,7 @@ import { createAppWrapper, createMainLayout } from './layout/layout';
 import { isLoginPage } from './router/router';
 
 async function handleRouteChange() {
-  const pathname = window.location.pathname || '/';
+  const pathname = window.location.pathname || '/lobby'; // 기본값을 '/lobby'로 변경
   const app = document.getElementById('app');
 
   if (!app) return;
@@ -20,7 +20,7 @@ async function handleRouteChange() {
     const { getPageContent } = await import('./router/router');
     const pageContent = await getPageContent(pathname);
 
-    // 실제 렌더링된 후 URL 확인 (인증 실패 시 URL이 '/'로 변경됨)
+    // 실제 렌더링된 후 URL 확인 (인증 실패 시 URL이 '/login'으로 변경됨)
     const actualPath = window.location.pathname;
 
     if (isLoginPage(actualPath)) {
@@ -35,8 +35,8 @@ async function handleRouteChange() {
     }
   } catch (error) {
     // 에러 발생 시 로그인 페이지로 리다이렉트
-    if (window.location.pathname !== '/') {
-      window.history.pushState(null, '', '/');
+    if (window.location.pathname !== '/login') { // '/login'으로 변경
+      window.history.pushState(null, '', '/login');
       await handleRouteChange();
     }
   }

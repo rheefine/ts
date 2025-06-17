@@ -72,7 +72,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           return reply.status(401).send({ error: 'Invalid token' });
         }
 
-        return reply.status(302).redirect('http://localhost:8080/lobby');
+        return reply.status(302).redirect('http://localhost/lobby');
       } catch (err) {
         request.log.error(err, '2FA not configured');
         return reply.status(400).send({ error: '2FA not configured' });

@@ -46,11 +46,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       schema: {
         response: {
           200: Type.Object({
-            message: Type.String(),
+            message: Type.Boolean(),
           }),
-          302: {
-            description: 'Redirect to login page',
-          },
           400: ErrorResponseSchema,
         },
         tags: ['auth'],
@@ -58,9 +55,10 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        authService.clearAuthCookie(reply);
-
-        return reply.status(302).redirect('http://localhost:8080/');
+        return authService
+          .clearAuthCookie(reply)
+          .status(200)
+          .send({message: true});
       } catch (err) {
         request.log.error(err);
         return reply.status(400).send({ error: 'Logout failed' });
@@ -95,22 +93,30 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         const accessToken = await oauthService.exchangeCodeForToken(code);
         const userInfo = await oauthService.getGoogleUserInfo(accessToken);
 
-        const payload = {
+        const tmpPayload = {
           email: userInfo.email,
           googleId: userInfo.id,
           name: userInfo.name,
           twoFA: false,
         };
 
-        const token = await fastify.jwt.sign(payload);
-        const twoFA = await oauthService.checkTwoFAStatus(token, userInfo.email);
+        const tmpToken = await fastify.jwt.sign(tmpPayload);
+
+        const twoFA = await oauthService.checkTwoFAStatus(tmpToken, userInfo.email);
+        const finalPayload = {
+          email: userInfo.email,
+          googleId: userInfo.id,
+          name: userInfo.name,
+          twoFA: twoFA, // 2FA 상태 반영
+        };
+        const token = await fastify.jwt.sign(finalPayload);
 
         const redirectUrl = authService.getRedirectUrl(twoFA);
 
         return authService
           .setAuthCookie(reply, token)
           .status(302)
-          .redirect(`http://localhost:8080${redirectUrl}`);
+          .redirect(`http://localhost${redirectUrl}`);
       } catch (err) {
         request.log.error(err);
         return reply.status(500).send({ error: 'OAuth failed' });

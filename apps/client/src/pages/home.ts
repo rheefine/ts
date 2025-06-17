@@ -49,15 +49,16 @@ export async function renderHome(): Promise<HTMLElement> {
   const container = createElement(renderHomeHTML());
   const listContainer = container.querySelector('#tournament-list-container')!;
 
-  // 토너먼트 정보 모달 표시
-  const showTournamentModal = async (tournamentId: number) => {
-    const modal = await createTournamentInfoModal(tournamentId);
-    modal.show();
-  };
-
-  // 토너먼트 리스트 컨테이너 생성 - await 추가
+  // 토너먼트 리스트 컨테이너를 먼저 생성
   const tournamentListContainer = await createTournamentListContainer({
-    onTournamentClick: showTournamentModal,
+    onTournamentClick: async (tournamentId: number) => {
+      // 여기서 직접 콜백을 정의
+      const modal = await createTournamentInfoModal(tournamentId, () => {
+        console.log('Tournament finished, refreshing list...'); // 디버깅용
+        tournamentListContainer.refreshTournaments();
+      });
+      modal.show();
+    },
   });
 
   // 토너먼트 생성 모달 표시

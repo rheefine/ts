@@ -1,5 +1,6 @@
 import { apiClient } from '../api';
 
 export async function postLogout(): Promise<void> {
-  await apiClient.post('api/auth/logout');
+    await apiClient.post('api/auth/logout');
+    window.location.href = '/login';
 }

@@ -61,7 +61,7 @@ services:
       context: .
       dockerfile: infra/waf/Dockerfile
     ports:
-      - '8080:8081'
+      - '80:80'
     depends_on:
       - auth-server
       - main-server

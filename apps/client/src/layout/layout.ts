@@ -36,7 +36,7 @@ export async function createMainLayout(pathname: string): Promise<HTMLElement> {
 
   if (navigatorContainer) {
     // navigator도 DOM 요소로 생성해야 함
-    const navigatorElement = createNavigator();
+    const navigatorElement = await createNavigator();
     navigatorContainer.appendChild(navigatorElement);
   }
 

@@ -4,15 +4,15 @@ import { getTournamentInfo } from '../services/tournaments/info.api';
 
 import type { TournamentInfoResponseDTO, GameResponseDTO } from '@hst/dto';
 
-export async function createTournamentInfoModal(tournamentId: number) {
+export async function createTournamentInfoModal(tournamentId: number, onTournamentUpdate: () => void) {
   const modal = createModal({
     id: 'tournament-modal',
     title: '토너먼트 정보',
     maxWidth: 'max-w-4xl',
   });
-
+  onTournamentUpdate();
   const showGameModal = (targetScore: number, gameInfo: GameResponseDTO) => {
-    const gameModal = createGameModal(tournamentId, targetScore, gameInfo);
+    const gameModal = createGameModal(tournamentId, targetScore, gameInfo,onTournamentUpdate);
     modal.close();
     gameModal.show();
   };

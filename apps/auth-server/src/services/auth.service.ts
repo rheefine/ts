@@ -9,7 +9,12 @@ export class AuthService {
   }
 
   setAuthCookie(reply: FastifyReply, token: string): FastifyReply {
-    return reply.setCookie('access_token', token, { httpOnly: true, path: '/api' });
+    return reply.setCookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
   }
 
   getRedirectUrl(twoFA: boolean): string {
@@ -17,7 +22,7 @@ export class AuthService {
   }
 
   clearAuthCookie(reply: FastifyReply): FastifyReply {
-    return reply.clearCookie('auth_token', {
+    return reply.clearCookie('access_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

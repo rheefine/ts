@@ -9,6 +9,7 @@ export function createGameModal(
   tournamentId: number,
   targetScore: number,
   gameInfo: GameResponseDTO,
+  onTournamentUpdate: () => void
 ) {
   let pongGame: PongGame | null = null;
 
@@ -107,7 +108,7 @@ export function createGameModal(
   nextGameBox?.addEventListener('click', async () => {
     // 게임 모달 닫고 토너먼트 정보 모달 열기
     modal.close();
-    const tournamentModal = await createTournamentInfoModal(tournamentId);
+    const tournamentModal = await createTournamentInfoModal(tournamentId, onTournamentUpdate);
     tournamentModal.show();
   });
 

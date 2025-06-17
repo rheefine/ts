@@ -22,4 +22,4 @@ COPY --from=frontend-builder /app/apps/client/dist /usr/share/nginx/html
 # 기본 default.conf를 우리 설정으로 교체
 COPY infra/waf/pingpong.conf /etc/nginx/conf.d/pingpong.conf
 
-EXPOSE 8081
+EXPOSE 80

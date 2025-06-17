@@ -1,5 +1,6 @@
 import { createElement } from '../utils/dom';
 import { navigateTo } from '../main';
+import { postLogout } from '../services/auth/logout.api';
 
 export function createNavigatorHTML(): string {
   const currentPath = typeof window !== 'undefined' ? window.location.pathname || '/' : '/';
@@ -42,7 +43,7 @@ export function createNavigatorHTML(): string {
   `;
 }
 
-export function createNavigator(): HTMLElement {
+export async function createNavigator(): Promise<HTMLElement> {
   const navigator = createElement(createNavigatorHTML());
 
   // 네비게이션 버튼 이벤트 리스너
@@ -54,11 +55,11 @@ export function createNavigator(): HTMLElement {
   settingBtn?.addEventListener('click', () => navigateTo('/setting'));
 
   // 로그아웃 버튼 이벤트 리스너
-  logoutBtn?.addEventListener('click', () => {
+  logoutBtn?.addEventListener('click', async () => {
     // 로그아웃 처리 로직 (토큰 삭제 등)
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
-    navigateTo('/');
+    await postLogout();
   });
 
   return navigator;

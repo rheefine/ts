@@ -12,7 +12,7 @@ const isValidTargetScore = (score: number): score is TournamentCreateRequestDTO[
   return score === 1 || score === 3 || score === 5;
 };
 
-export function createTournamentCreateModal(onTournamentCreated?: (tournamentId?: number) => void) {
+export function createTournamentCreateModal(onTournamentCreated: () => void) {
   let selectedPlayerCount: TournamentCreateRequestDTO['playerCount'] = 2;
   let selectedTargetScore: TournamentCreateRequestDTO['targetScore'] = 1;
 
@@ -173,9 +173,8 @@ export function createTournamentCreateModal(onTournamentCreated?: (tournamentId?
 
       const createResponse = await postTournament(requestData);
       modal.close();
-      const tournamentInfoModal = await createTournamentInfoModal(createResponse.tournamentId);
+      const tournamentInfoModal = await createTournamentInfoModal(createResponse.tournamentId,onTournamentCreated);
       tournamentInfoModal.show();
-      onTournamentCreated?.(createResponse.tournamentId);
     } catch (error) {
       console.error('Tournament creation failed:', error);
       alert('토너먼트 생성에 실패했습니다.');
