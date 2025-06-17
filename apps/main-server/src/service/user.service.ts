@@ -61,8 +61,10 @@ export class UserService {
       throw new Error('User not found');
     }
 
+    console.info(`Updating 2FA for user: ${userEmail}, 2FA enabled: ${dto.twoFA}`, clientToken);
+    
     if (dto.twoFA) {
-      return await this.enableTwoFA(user.id, clientToken);
+      return await this.enableTwoFA(user.id, userEmail, clientToken);
     } else {
       return await this.disableTwoFA(user.id);
     }
@@ -70,10 +72,11 @@ export class UserService {
 
   private async enableTwoFA(
     userId: number,
+    userEmail: string,
     clientToken: string,
   ): Promise<UserSettingUpdateResponseDTO> {
     const response = await axios.get<Auth2FASetupResponseDTO>(
-      `${process.env.AUTH_SERVER_URL}/api/auth/twofa/setup`,
+      `${process.env.AUTH_SERVER_URL}/api/auth/twofa/setup?email=${userEmail}`,
       {
         headers: {
           Authorization: `Bearer ${clientToken}`,
@@ -86,12 +89,13 @@ export class UserService {
     }
 
     const { qrLink, secretKey } = response.data;
+    console.log(`2FA setup for user: ${userEmail}, QR Link: ${qrLink}, Secret Key: ${secretKey}`);
 
     const updatedUser = await this.userRepo.updateTwofa(userId, true, secretKey);
     if (!updatedUser) {
       throw new Error('Failed to update user setting');
     }
-    return { twofa: true, qrLink };
+    return { qrLink, twofa: true };
   }
 
   private async disableTwoFA(userId: number): Promise<UserSettingUpdateResponseDTO> {

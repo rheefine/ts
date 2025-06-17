@@ -31,6 +31,10 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         const secret = twoFactorService.generateSecret(email);
         const qrLink = await twoFactorService.generateQRCode(secret.otpauth_url);
 
+        console.info(
+          `Generated 2FA secret for user: ${email}, QR Link: ${qrLink}`,
+        );
+
         return reply.status(200).send({ qrLink, secretKey: secret.base32 });
       } catch (err) {
         request.log.error(err, 'Failed to save 2FA secret to main server');
@@ -46,7 +50,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       schema: {
         body: Auth2FAVerifyRequestSchema,
         response: {
-          201: {},
+          302: {},
           400: ErrorResponseSchema,
           401: ErrorResponseSchema,
         },
@@ -68,7 +72,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           return reply.status(401).send({ error: 'Invalid token' });
         }
 
-        return reply.status(201);
+        return reply.status(302).redirect('http://localhost:8080/lobby');
       } catch (err) {
         request.log.error(err, '2FA not configured');
         return reply.status(400).send({ error: '2FA not configured' });

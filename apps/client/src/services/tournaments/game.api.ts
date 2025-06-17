@@ -5,5 +5,5 @@ export async function patchGame(
   tournamentId: number,
   gameData: GameUpdateRequestDTO,
 ): Promise<void> {
-  await apiClient.patch(`api/tournaments/${tournamentId}/games`, gameData);
+  await apiClient.post(`api/tournaments/${tournamentId}/games`, gameData);
 }

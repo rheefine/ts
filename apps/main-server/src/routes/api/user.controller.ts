@@ -2,9 +2,9 @@ import { UserService } from '../../service/user.service.js';
 import {
   UserSettingUpdateRequestSchema,
   UserSettingResponseSchema,
-  UserSettingUpdateRequestDTO,
   ErrorResponseSchema,
   UserSecretKeyResponseSchema,
+  UserSettingUpdateResponseSchema,
 } from '@hst/dto';
 import { FastifyPluginAsyncTypebox, Type } from '@fastify/type-provider-typebox';
 
@@ -59,24 +59,24 @@ const plugin: FastifyPluginAsyncTypebox = async (app) => {
     },
   );
 
-  app.patch<{ Body: UserSettingUpdateRequestDTO }>(
-    '/user/setting',
+  app.post(
+    '/user/setting/twofa',
     {
       schema: {
         body: UserSettingUpdateRequestSchema,
         response: {
-          204: {},
-          500: ErrorResponseSchema,
+          200: UserSettingUpdateResponseSchema,
+          500: ErrorResponseSchema
         },
         tags: ['user'],
       },
     },
     async (request, reply) => {
-      const clientToken = request.cookies.access_token;
-      const { email } = request.user;
       try {
-        await userService.updateUser2fa(email, clientToken, request.body);
-        return reply.status(204).send();
+        const clientToken = request.cookies.access_token;
+        const { email } = request.user;
+        const response = await userService.updateUser2fa(email, clientToken, request.body);
+        return reply.status(200).send(response);
       } catch (error) {
         return reply.status(500).send({
           error: 'Failed to update user',

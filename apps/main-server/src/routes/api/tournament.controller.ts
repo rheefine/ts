@@ -100,7 +100,7 @@ const plugin: FastifyPluginAsyncTypebox = async (app) => {
     },
   );
 
-  app.patch<{ Params: { tournamentId: string }; Body: GameUpdateRequestDTO }>(
+  app.post<{ Params: { tournamentId: string }; Body: GameUpdateRequestDTO }>(
     '/tournaments/:tournamentId/games',
     {
       schema: {

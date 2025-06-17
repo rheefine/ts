@@ -60,7 +60,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       try {
         authService.clearAuthCookie(reply);
 
-        return reply.status(302).redirect('https://localhost:8443/');
+        return reply.status(302).redirect('http://localhost:8080/');
       } catch (err) {
         request.log.error(err);
         return reply.status(400).send({ error: 'Logout failed' });
@@ -110,7 +110,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         return authService
           .setAuthCookie(reply, token)
           .status(302)
-          .redirect(`https://localhost:8443${redirectUrl}`);
+          .redirect(`http://localhost:8080${redirectUrl}`);
       } catch (err) {
         request.log.error(err);
         return reply.status(500).send({ error: 'OAuth failed' });
