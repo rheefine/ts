@@ -4,9 +4,11 @@ import {
   Auth2FAVerifyRequestSchema,
   ErrorResponseSchema,
 } from '@hst/dto';
+import { AuthService } from '../../../services/auth.service.js';
 import { TwoFactorService } from '../../../services/twoFactor.service.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
+  const authService = new AuthService(fastify);
   const twoFactorService = new TwoFactorService();
 
   // OTP 시크릿 생성 및 QR 코드 발급
@@ -31,9 +33,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         const secret = twoFactorService.generateSecret(email);
         const qrLink = await twoFactorService.generateQRCode(secret.otpauth_url);
 
-        console.info(
-          `Generated 2FA secret for user: ${email}, QR Link: ${qrLink}`,
-        );
+        console.info(`Generated 2FA secret for user: ${email}, QR Link: ${qrLink}`);
 
         return reply.status(200).send({ qrLink, secretKey: secret.base32 });
       } catch (err) {
@@ -72,7 +72,15 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           return reply.status(401).send({ error: 'Invalid token' });
         }
 
-        return reply.status(302).redirect('http://localhost/lobby');
+        const payload = {
+          ...request.user,
+          twofaVerified: true,
+        };
+        const twoFAToken = await fastify.jwt.sign(payload);
+        return authService
+          .setAuthCookie(reply, twoFAToken)
+          .status(302)
+          .redirect('http://localhost/lobby');
       } catch (err) {
         request.log.error(err, '2FA not configured');
         return reply.status(400).send({ error: '2FA not configured' });

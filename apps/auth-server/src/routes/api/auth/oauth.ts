@@ -55,10 +55,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        return authService
-          .clearAuthCookie(reply)
-          .status(200)
-          .send({message: true});
+        return authService.clearAuthCookie(reply).status(200).send({ message: true });
       } catch (err) {
         request.log.error(err);
         return reply.status(400).send({ error: 'Logout failed' });
@@ -97,7 +94,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           email: userInfo.email,
           googleId: userInfo.id,
           name: userInfo.name,
-          twoFA: false,
+          twofaEnabled: false,
+          twofaVerified: false,
         };
 
         const tmpToken = await fastify.jwt.sign(tmpPayload);
@@ -107,7 +105,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           email: userInfo.email,
           googleId: userInfo.id,
           name: userInfo.name,
-          twoFA: twoFA, // 2FA 상태 반영
+          twofaEnabled: twoFA,
+          twofaVerified: false,
         };
         const token = await fastify.jwt.sign(finalPayload);
 

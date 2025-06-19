@@ -6,6 +6,10 @@ export default async function (fastify: FastifyInstance) {
 
     try {
       await request.jwtVerify();
+      if (request.url.startsWith('/api/auth/twofa/verify')) return;
+      if (request.user.twofaEnabled === true && request.user.twofaVerified === false) {
+        throw new Error('twofa verifycation failed');
+      }
     } catch (err) {
       request.log.warn(err, 'JWT verification failed');
       return reply.status(401).send({

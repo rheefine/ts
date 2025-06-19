@@ -55,7 +55,7 @@ export function renderSetting(): HTMLElement {
       const newTwoFAState = twoFAToggle.checked;
 
       const setupData = await patchUserSettings({ twoFA: newTwoFAState });
-      showQRModal(setupData.qrLink);
+      if (setupData.twofa === true) showQRModal(setupData.qrLink);
     } catch (error) {
       // 실패 시 토글 상태 되돌리기
       twoFAToggle.checked = !twoFAToggle.checked;
