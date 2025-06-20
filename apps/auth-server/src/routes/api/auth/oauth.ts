@@ -115,7 +115,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         return authService
           .setAuthCookie(reply, token)
           .status(302)
-          .redirect(`http://localhost${redirectUrl}`);
+          .redirect(`${process.env.CLIENT_SERVER_URL}${redirectUrl}`);
       } catch (err) {
         request.log.error(err);
         return reply.status(500).send({ error: 'OAuth failed' });

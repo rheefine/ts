@@ -80,7 +80,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         return authService
           .setAuthCookie(reply, twoFAToken)
           .status(302)
-          .redirect('http://localhost/lobby');
+          .redirect(`${process.env.CLIENT_SERVER_URL}/lobby`);
       } catch (err) {
         request.log.error(err, '2FA not configured');
         return reply.status(400).send({ error: '2FA not configured' });
