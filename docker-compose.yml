@@ -25,20 +25,13 @@ services:
     networks:
       - app
       - monitoring
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    ports:
-      - '9200:9200'
-    networks:
-      - monitoring
       
   vault:
     image: hashicorp/vault
     ports:
       - '8200:8200'
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: dev-token
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID}
     cap_add:
       - IPC_LOCK
     networks:
@@ -52,7 +45,7 @@ services:
     restart: 'no'
     environment:
       VAULT_ADDR: http://vault:8200
-      VAULT_TOKEN: dev-token
+      VAULT_TOKEN: ${VAULT_DEV_ROOT_TOKEN_ID}
     networks:
       - vault
 
@@ -61,7 +54,7 @@ services:
       context: .
       dockerfile: infra/waf/Dockerfile
     ports:
-      - '80:80'
+      - '443:443'
     depends_on:
       - auth-server
       - main-server

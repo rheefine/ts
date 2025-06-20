@@ -146,19 +146,19 @@ export class GameService {
     dto: GameUpdateRequestDTO,
     tournamentId: number,
   ) {
-    if (tournament.isFinished) {
-      throw new Error('Tournament is already finished');
-    }
-
     const game = await this.gameRepo.findById(dto.gameID);
     if (!game) {
       throw new Error('Game not found');
     }
-
     if (game.tournamentId !== tournamentId) {
       throw new Error('Game does not belong to this tournament');
     }
-
+    if (tournament.isFinished) {
+      throw new Error('Tournament is already finished');
+    }
+    if (game.player1 !== dto.player1 || game.player2 !== dto.player2) {
+      throw new Error('Cannot update scores for the same players');
+    }
     if (
       dto.player1Score < 0 ||
       dto.player2Score < 0 ||
@@ -168,6 +168,20 @@ export class GameService {
       dto.player2Score > tournament.targetScore
     ) {
       throw new Error('Scores must be non-negative');
+    }
+
+    const games = await this.gameRepo.findAllByTournamentId(tournamentId);
+
+    for (const g of games) {
+      if (g.id === dto.gameID) break ;
+      if (g.id < dto.gameID)
+        if (this.determineWinner(g.player1Score, g.player2Score, tournament.targetScore) === null) {
+          throw new Error('Previous game must have a winner');
+        }
+    }
+
+    if (this.determineWinner(game.player1Score, game.player2Score, tournament.targetScore) !== null) {
+      throw new Error('Game already has a winner');
     }
 
     return game;

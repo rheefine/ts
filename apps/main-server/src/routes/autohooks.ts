@@ -4,6 +4,8 @@ export default async function (fastify: FastifyInstance) {
   fastify.addHook('onRequest', async (request, reply) => {
     try {
       await request.jwtVerify();
+      if (request.url.startsWith('/api/user/twofa'))
+        return;
       if (request.user.twofaEnabled === true && request.user.twofaVerified === false) {
         throw new Error('twofa verifycation failed');
       }
